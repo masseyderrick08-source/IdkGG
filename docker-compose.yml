@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: madden
+      POSTGRES_PASSWORD: madden
+      POSTGRES_DB: madden
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U madden -d madden"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes: [postgres_data:/var/lib/postgresql/data]
+  bot:
+    build: .
+    env_file: .env
+    ports: ["3000:3000"]
+    depends_on:
+      postgres: {condition: service_healthy}
+volumes: {postgres_data: {}}
